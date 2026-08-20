@@ -58,8 +58,25 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/
-          server-dir: /public_html/
+          # this FTP account is rooted at the Casrose web root already,
+          # so uploads go to the login directory itself
+          server-dir: ./
           # only these files are managed here; anything else on the server is left alone
           exclude: |
             **/.git*
             **/.git*/**
+
+      - name: Verify the live site actually updated
+        run: |
+          echo "Waiting a moment for the filesystem to settle..."
+          sleep 10
+          url="https://casrose.co.uk/?ci=${{ github.run_id }}"
+          body=$(curl -sSL --max-time 30 "$url" || true)
+          if echo "$body" | grep -q "casrose-hero"; then
+            echo "Live site is serving the hero page."
+          else
+            echo "::error::casrose.co.uk did not serve the expected page after deploy."
+            echo "First 400 chars of what it returned:"
+            echo "$body" | head -c 400
+            exit 1
+          fi
