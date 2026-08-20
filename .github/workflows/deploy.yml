@@ -40,6 +40,7 @@ jobs:
           mkdir -p deploy
           cp index.html deploy/index.html
           cp .htaccess deploy/.htaccess
+          cp contact.php deploy/contact.php
           ls -la deploy
 
       - name: Fail if the build produced nothing

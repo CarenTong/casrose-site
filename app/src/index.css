@@ -14,11 +14,18 @@ body {
   background: #14110e; /* matches the hero so there's no flash/letterbox */
   min-height: 100vh;
   min-height: 100dvh;
-  overflow: hidden; /* the hero owns the viewport; no page scroll */
+  /* The hero fills the first screen, the contact section sits below it, so the
+     page scrolls. Horizontal overflow stays clipped. */
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+}
+
+/* smooth in-page jumps, unless the visitor asked for less motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

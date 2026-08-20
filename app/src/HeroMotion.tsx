@@ -77,11 +77,14 @@ type HeroMotionProps = {
   fullBleed?: boolean;
   /** Show the small "under construction" status pill in the top-right. */
   underConstruction?: boolean;
+  /** Called by the CTA and the Contact link. Undefined leaves them decorative. */
+  onContact?: () => void;
 };
 
 export default function HeroMotion({
   fullBleed = false,
   underConstruction = false,
+  onContact,
 }: HeroMotionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -561,7 +564,7 @@ export default function HeroMotion({
             <button type="button" className="casrose-navlink" data-target>
               Studio
             </button>
-            <button type="button" className="casrose-navlink" data-target>
+            <button type="button" className="casrose-navlink" data-target onClick={onContact}>
               Contact
             </button>
           </div>
@@ -599,7 +602,7 @@ export default function HeroMotion({
           <p className="casrose-tagline" data-target>
             Rise Together
           </p>
-          <button type="button" className="casrose-cta" data-target>
+          <button type="button" className="casrose-cta" data-target onClick={onContact}>
             Start a project
           </button>
         </div>

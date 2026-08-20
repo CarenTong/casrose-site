@@ -1,0 +1,230 @@
+/* ============================================================================
+   Contact section + footer. Same Midnight Rose palette and type as the hero,
+   but calm and readable — no motion, no custom cursor.
+   ========================================================================== */
+
+.cr-contact,
+.cr-footer {
+  --midnight: #14110e;
+  --ink: #f4ede1;
+  --muted: #9a8f7d;
+  --gold: #e8b56e;
+  --gold-dim: rgba(232, 181, 110, 0.4);
+  --field: rgba(255, 255, 255, 0.04);
+  background: var(--midnight);
+  color: var(--ink);
+}
+
+.cr-contact {
+  padding: 72px 24px 56px;
+  border-top: 1px solid rgba(232, 181, 110, 0.14);
+}
+
+.cr-contact-inner {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.cr-contact-title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+}
+
+.cr-contact-lede {
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 32px;
+}
+
+/* ---- form ---------------------------------------------------------------- */
+
+.cr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cr-field label {
+  font-family: "Jost", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cr-field input,
+.cr-field textarea {
+  font-family: "Jost", sans-serif;
+  /* Must stay >=16px: iOS Safari zooms the page in when you focus an input
+     smaller than that, and does not zoom back out. */
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--field);
+  border: 1px solid rgba(232, 181, 110, 0.22);
+  border-radius: 8px;
+  padding: 12px 14px;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cr-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.cr-field input:focus,
+.cr-field textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(232, 181, 110, 0.16);
+}
+
+/* browser validation styling, only after the user has tried */
+.cr-field input:user-invalid,
+.cr-field textarea:user-invalid {
+  border-color: rgba(224, 122, 95, 0.8);
+}
+
+/* honeypot — hidden from people without display:none, which some bots skip */
+.cr-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.cr-submit {
+  font-family: "Jost", sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  color: #f0e3c4;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 14px 30px; /* comfortable tap target */
+  border: 1px solid rgba(232, 181, 110, 0.55);
+  border-radius: 999px;
+  background: rgba(232, 181, 110, 0.08);
+  cursor: pointer;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cr-submit:hover:not(:disabled),
+.cr-submit:focus-visible {
+  background: rgba(232, 181, 110, 0.16);
+  box-shadow: 0 0 18px rgba(232, 181, 110, 0.3);
+  outline: none;
+}
+
+.cr-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cr-privacy,
+.cr-status {
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cr-privacy {
+  color: #6e6455;
+}
+
+.cr-status:empty {
+  display: none;
+}
+
+.cr-status.is-sent {
+  color: #8fbf8f;
+}
+
+.cr-status.is-error {
+  color: #e07a5f;
+}
+
+/* ---- direct contact ------------------------------------------------------ */
+
+.cr-direct {
+  margin-top: 36px;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cr-direct p {
+  margin: 0 0 8px;
+}
+
+.cr-direct ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cr-direct a {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-dim);
+  padding-bottom: 1px;
+}
+
+.cr-direct a:hover,
+.cr-direct a:focus-visible {
+  border-bottom-color: var(--gold);
+}
+
+/* ---- footer -------------------------------------------------------------- */
+
+.cr-footer {
+  padding: 28px 24px 40px;
+  border-top: 1px solid rgba(232, 181, 110, 0.1);
+  font-family: "Jost", sans-serif;
+  font-size: 11.5px;
+  line-height: 1.8;
+  color: #6e6455;
+  text-align: center;
+}
+
+.cr-footer p {
+  margin: 0;
+}
+
+.cr-footer .cr-legal {
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .cr-contact {
+    padding: 52px 18px 44px;
+  }
+
+  .cr-contact-title {
+    font-size: 28px;
+  }
+
+  .cr-submit {
+    align-self: stretch; /* full-width tap target on a phone */
+    text-align: center;
+  }
+
+  .cr-footer {
+    padding: 24px 18px 34px;
+  }
+}
