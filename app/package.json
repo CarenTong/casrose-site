@@ -1,0 +1,29 @@
+{
+  "name": "casrose-hero-motion",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Casrose 'Midnight Rose' cursor-reactive hero motion section.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "site": "npm run build && node make-favicon.mjs && node make-single.mjs && node -e \"require('fs').copyFileSync('dist-single/index.html','../index.html')\""
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.1.0",
+    "@fontsource/jost": "^5.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}

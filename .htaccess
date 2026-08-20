@@ -1,0 +1,11 @@
+# The site is the single self-contained index.html at the document root.
+# /app holds the Vite source that builds it and must never be served.
+RewriteEngine On
+RewriteRule ^app(/|$) - [F,L]
+
+# Long-cache nothing: index.html is the whole site and changes on every deploy.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>

@@ -1,0 +1,464 @@
+/* ============================================================================
+   Casrose — Midnight Rose hero motion section.
+   Values pulled from casrose_style_pack_midnight_rose.md §§1-6.
+   ========================================================================== */
+
+.casrose-hero {
+  --midnight: #14110e;
+  --wordmark: #f4ede1;
+  --tagline: #9a8f7d;
+  --nav: #e8e1d3;
+  --nav-hover: #f6e9c8;
+  --brand: #b3905e;
+  --cta: #f0e3c4;
+  --hint: #6e6455;
+
+  position: relative;
+  height: 480px;
+  border-radius: 16px;
+  overflow: hidden;
+  isolation: isolate; /* keep glow / blend effects off surrounding page chrome */
+  background:
+    radial-gradient(42% 42% at 0% 0%, rgba(155, 79, 41, 0.28), transparent 70%),
+    radial-gradient(45% 45% at 100% 100%, rgba(179, 144, 94, 0.22), transparent 70%),
+    var(--midnight);
+  color: var(--wordmark);
+  cursor: none; /* native pointer replaced by the custom glyph */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* full-viewport variant for the live homepage (vs the 480px demo card) */
+.casrose-hero.is-fullbleed {
+  height: 100vh;
+  height: 100dvh;
+  border-radius: 0;
+}
+
+/* ---- z-index stack: canvas → orb → content → cursor glyph ---------------- */
+
+.casrose-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.casrose-orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 340px;
+  height: 340px;
+  margin: -170px 0 0 -170px; /* centre on its translate origin */
+  border-radius: 50%;
+  filter: blur(6px);
+  background: radial-gradient(
+    circle,
+    rgba(232, 165, 77, 0.3) 0%,
+    rgba(232, 165, 77, 0.08) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.casrose-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- nav ----------------------------------------------------------------- */
+
+.casrose-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  /* respect the notch / Dynamic Island in landscape */
+  padding: 18px max(24px, env(safe-area-inset-right)) 18px max(24px, env(safe-area-inset-left));
+}
+
+/* pushes the pill + links to the right edge on one row. The pill sits before
+   the links in the DOM (so phones can drop the links to a second row), so the
+   wide layout uses order to put it back on the far right. */
+.casrose-brand {
+  order: 1;
+  margin-right: auto;
+}
+
+.casrose-navlinks {
+  order: 2;
+}
+
+.casrose-status {
+  order: 3;
+}
+
+.casrose-brand {
+  font-family: "Jost", sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.18em;
+  font-weight: 400;
+  color: var(--brand);
+  background: none;
+  border: 0;
+  padding: 8px 4px; /* ≥40px tap target height */
+  cursor: none;
+}
+
+.casrose-navlinks {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.casrose-navlink {
+  font-family: "Jost", sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+  color: var(--nav);
+  background: none;
+  border: 0;
+  padding: 12px 6px; /* real ≥40px tap target regardless of glyph size */
+  cursor: none;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.casrose-navlink:hover,
+.casrose-navlink:focus-visible {
+  color: var(--nav-hover);
+  text-shadow: 0 0 12px rgba(232, 181, 110, 0.85), 0 0 26px rgba(232, 181, 110, 0.5);
+  outline: none;
+}
+
+/* under-construction status pill (top-right, non-interactive) */
+.casrose-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: "Jost", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--cta);
+  padding: 6px 12px;
+  margin-left: 6px;
+  border: 1px solid rgba(232, 181, 110, 0.4);
+  border-radius: 999px;
+  background: rgba(232, 181, 110, 0.05);
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.casrose-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e8b56e;
+  box-shadow: 0 0 8px rgba(232, 181, 110, 0.9);
+}
+
+/* ---- centre stack -------------------------------------------------------- */
+
+.casrose-centre {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.casrose-emblem-shell {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  perspective: 700px;
+}
+
+.casrose-emblem {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  filter:
+    drop-shadow(0 0 16px rgba(212, 150, 84, 0.5))
+    drop-shadow(0 0 34px rgba(155, 79, 41, 0.32));
+}
+
+.casrose-emblem svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* one-time diagonal load-in shine (§5.2) */
+.casrose-emblem-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 240, 214, 0.85) 48%,
+    transparent 62%
+  );
+  background-size: 250% 250%;
+  background-position: 150% 150%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.casrose-emblem-shell.is-shining .casrose-emblem-shine {
+  animation: casrose-shine 1.6s ease-out 0.3s 1 forwards;
+}
+
+@keyframes casrose-shine {
+  0% {
+    background-position: 150% 150%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    background-position: -60% -60%;
+    opacity: 0;
+  }
+}
+
+.casrose-wordmark {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 27px;
+  letter-spacing: 0.22em;
+  font-weight: 500;
+  color: var(--wordmark);
+  margin: 0;
+  /* 0.22em trailing space would otherwise push the word off-centre */
+  text-indent: 0.22em;
+}
+
+.casrose-tagline {
+  font-family: "Jost", sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--tagline);
+  margin: 0;
+  text-indent: 0.32em;
+}
+
+.casrose-cta {
+  font-family: "Jost", sans-serif;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+  color: var(--cta);
+  margin-top: 4px;
+  padding: 11px 22px; /* ≥40px tap height */
+  border: 1px solid rgba(232, 181, 110, 0.55);
+  border-radius: 999px;
+  background: rgba(232, 181, 110, 0.06);
+  cursor: none;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.casrose-cta:hover,
+.casrose-cta:focus-visible {
+  background: rgba(232, 181, 110, 0.14);
+  box-shadow: 0 0 18px rgba(232, 181, 110, 0.35);
+  outline: none;
+}
+
+.casrose-hint {
+  font-family: "Jost", sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  font-weight: 400;
+  color: var(--hint);
+  text-align: center;
+  padding: 0 24px 16px;
+  margin: 0;
+}
+
+/* ---- custom cursor glyph (§5.3) ----------------------------------------- */
+
+.casrose-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9; /* always on top */
+  width: 26px;
+  height: 26px;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 7px rgba(232, 181, 110, 0.85));
+  will-change: transform, opacity;
+}
+
+.casrose-cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================================
+   Reduced motion — fully disable continuous animation (§6 / §7).
+   ========================================================================== */
+
+.casrose-hero.is-reduced .casrose-emblem {
+  transform: none !important; /* tilt locked flat */
+}
+
+.casrose-hero.is-reduced .casrose-orb {
+  display: none;
+}
+
+/* shine becomes a static fixed-opacity sheen, no sweep */
+.casrose-hero.is-reduced .casrose-emblem-shine {
+  animation: none;
+  background-position: 50% 50%;
+  opacity: 0.4;
+}
+
+/* ============================================================================
+   Touch / coarse pointer — no custom cursor, no hover-driven state (§6).
+   ========================================================================== */
+
+.casrose-hero.is-coarse {
+  cursor: auto;
+}
+
+.casrose-hero.is-coarse .casrose-brand,
+.casrose-hero.is-coarse .casrose-navlink,
+.casrose-hero.is-coarse .casrose-cta {
+  cursor: pointer;
+}
+
+.casrose-hero.is-coarse .casrose-cursor,
+.casrose-hero.is-coarse .casrose-orb {
+  display: none;
+}
+
+.casrose-hero.is-coarse .casrose-emblem {
+  transform: none !important; /* no tilt without a hovering pointer */
+}
+
+
+/* ============================================================================
+   Small screens (phones). The nav is the pinch point: brand + 3 links + the
+   status pill do not fit on one 375px row, which pushed the pill off-screen.
+   Row 1 keeps the wordmark and the pill; the links drop to their own row.
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .casrose-nav {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: 14px;
+    row-gap: 8px;
+  }
+
+  .casrose-status {
+    order: 2; /* stays on row 1, right of the wordmark */
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    margin-left: 0;
+  }
+
+  .casrose-navlinks {
+    order: 3;
+    flex-basis: 100%; /* full-width second row */
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .casrose-navlink {
+    padding: 10px 4px;
+  }
+
+  .casrose-centre {
+    gap: 10px;
+    padding: 0 16px;
+  }
+
+  .casrose-emblem-shell {
+    width: 96px;
+    height: 96px;
+  }
+
+  .casrose-wordmark {
+    font-size: 23px;
+    letter-spacing: 0.18em;
+    text-indent: 0.18em;
+  }
+
+  .casrose-tagline {
+    font-size: 9.5px;
+    letter-spacing: 0.26em;
+    text-indent: 0.26em;
+  }
+
+  .casrose-hint {
+    padding: 0 20px max(14px, env(safe-area-inset-bottom));
+    font-size: 9.5px;
+  }
+}
+
+/* Very narrow (iPhone SE / 320px): drop the pill's wording to the essentials
+   rather than let it wrap or clip. */
+@media (max-width: 360px) {
+  .casrose-brand {
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+  }
+
+  .casrose-status {
+    font-size: 8.5px;
+    padding: 5px 8px;
+    gap: 5px;
+  }
+
+  .casrose-navlinks {
+    gap: 6px;
+  }
+}
+
+/* Landscape phones are short, not narrow — shrink the vertical stack so the
+   centre content and the hint still fit without scrolling. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .casrose-nav {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .casrose-emblem-shell {
+    width: 74px;
+    height: 74px;
+  }
+
+  .casrose-centre {
+    gap: 8px;
+  }
+
+  .casrose-wordmark {
+    font-size: 20px;
+  }
+
+  .casrose-hint {
+    padding-bottom: 8px;
+  }
+}
