@@ -15,6 +15,10 @@ const ORB_LERP = 0.12;
 const SPARK_CHANCE = 0.016; // per frame ≈ ~1/sec at 60fps
 const SPARK_LIFE = 16; // frames a spark stays visible before it's gone
 
+// On touch the glyph is drawn above the contact point: a fingertip completely
+// covers a 26px mark, so centring it on the touch would hide the whole effect.
+const TOUCH_CURSOR_LIFT = 46;
+
 // The style pack specified a destination-out trail-fade. That technique can't
 // actually reach zero at 8-bit alpha precision (5 * 0.91 rounds back to 5), so it
 // left a permanent faint film on the canvas. We clear every frame instead and let
@@ -332,8 +336,8 @@ export default function HeroMotion({
       ctx!.clearRect(0, 0, width, height);
 
       // intermittent cursor sparks (only while the glyph is live)
-      if (!coarse && cursorVisible && Math.random() < SPARK_CHANCE) {
-        spawnSpark(pointer.x, pointer.y);
+      if (cursorVisible && Math.random() < SPARK_CHANCE) {
+        spawnSpark(pointer.x, pointer.y - (coarse ? TOUCH_CURSOR_LIFT : 0));
       }
       drawSparks();
 
@@ -422,10 +426,19 @@ export default function HeroMotion({
     }
 
     function showCursor() {
-      if (coarse) return;
       cursorVisible = true;
       if (cursorRef.current) cursorRef.current.style.opacity = "1";
-      if (orbRef.current) orbRef.current.style.opacity = "1";
+      // the ambient orb stays a hover-only flourish; touch gets the glyph alone
+      if (!coarse && orbRef.current) orbRef.current.style.opacity = "1";
+    }
+
+    /** Position the glyph, lifted clear of the fingertip on touch. */
+    function placeCursor(x: number, y: number) {
+      if (!cursorRef.current) return;
+      const size = coarse ? 17 : 13; // half the glyph width
+      const lift = coarse ? TOUCH_CURSOR_LIFT : 0;
+      cursorRef.current.style.transform =
+        `translate(${x - size}px, ${y - size - lift}px)`;
     }
 
     function onPointerMove(e: PointerEvent) {
@@ -435,11 +448,16 @@ export default function HeroMotion({
       pointer.x = p.x;
       pointer.y = p.y;
 
-      if (!coarse) {
-        // cursor glyph tracks 1:1 — no lerp, immediate (§5.3)
-        if (cursorRef.current) {
-          cursorRef.current.style.transform = `translate(${p.x - 13}px, ${p.y - 13}px)`;
+      // On touch the glyph only exists while a finger is down; with a mouse it
+      // follows the pointer the whole time it is over the hero.
+      if (coarse) {
+        if (dragging) {
+          placeCursor(p.x, p.y);
+          if (!cursorVisible) showCursor();
         }
+      } else {
+        // cursor glyph tracks 1:1 — no lerp, immediate (§5.3)
+        placeCursor(p.x, p.y);
         if (!cursorVisible) showCursor();
         if (!orbSeeded) {
           orb.x = p.x;
@@ -479,12 +497,21 @@ export default function HeroMotion({
         return;
       }
       dragging = true;
+      if (coarse) {
+        placeCursor(p.x, p.y);
+        showCursor();
+      }
       spawnRipples(p.x, p.y);
       burst(p.x, p.y, 10);
     }
 
     function endDrag() {
       dragging = false;
+      if (coarse) {
+        // no hover on touch: the glyph fades out with the finger
+        cursorVisible = false;
+        if (cursorRef.current) cursorRef.current.style.opacity = "0";
+      }
     }
 
     function onPointerLeave() {

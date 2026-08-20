@@ -228,3 +228,14 @@
     padding: 24px 18px 34px;
   }
 }
+
+.cr-footer a {
+  color: #8a7f6d;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 181, 110, 0.25);
+}
+
+.cr-footer a:hover,
+.cr-footer a:focus-visible {
+  color: var(--gold);
+}

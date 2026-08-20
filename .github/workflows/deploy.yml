@@ -29,6 +29,11 @@ jobs:
           npm ci
           npm install --no-save sharp png-to-ico
 
+      # GitHub runners ship with PHP, so the endpoint gets syntax-checked on
+      # every push. A typo here would 500 the contact form instead of emailing.
+      - name: Lint the PHP endpoint
+        run: php -l contact.php
+
       - name: Build the site
         working-directory: app
         run: npm run site

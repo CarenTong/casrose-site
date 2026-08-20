@@ -26,6 +26,9 @@ export default function App() {
           number ZB941135.
         </p>
         <p className="cr-legal">71–75 Shelton Street, Covent Garden, London, WC2H 9JQ</p>
+        <p className="cr-legal">
+          <a href="tel:+44349956460">+44 34995 6460</a>
+        </p>
       </footer>
     </>
   );

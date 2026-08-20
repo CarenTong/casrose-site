@@ -131,6 +131,9 @@ export default function ContactSection() {
             <li>
               <a href="mailto:cas@casrose.co.uk">cas@casrose.co.uk</a>
             </li>
+            <li>
+              <a href="tel:+44349956460">+44 34995 6460</a>
+            </li>
           </ul>
         </div>
       </div>
