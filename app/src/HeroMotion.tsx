@@ -12,12 +12,17 @@ const TILT_MAX_DEG = 28;
 const TILT_LERP = 0.09;
 const ORB_LERP = 0.12;
 
-const SPARK_CHANCE = 0.016; // per frame ≈ ~1/sec at 60fps
+const SPARK_CHANCE = 0.055; // per frame ≈ ~3/sec at 60fps
 const SPARK_LIFE = 16; // frames a spark stays visible before it's gone
 
 // On touch the glyph is drawn above the contact point: a fingertip completely
 // covers a 26px mark, so centring it on the touch would hide the whole effect.
 const TOUCH_CURSOR_LIFT = 46;
+
+// Where the glyph waits on a touch device when nobody is dragging, as a
+// fraction of the hero box: below the CTA and clear of the hint line.
+const TOUCH_REST_X = 0.5;
+const TOUCH_REST_Y = 0.74;
 
 // The style pack specified a destination-out trail-fade. That technique can't
 // actually reach zero at 8-bit alpha precision (5 * 0.91 rounds back to 5), so it
@@ -181,6 +186,13 @@ export default function HeroMotion({
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx!.clearRect(0, 0, width, height); // no stale trail after a resize
       cacheTargets();
+      // On touch the glyph is always on show, so give it a home to sit in.
+      if (coarse && !dragging) {
+        pointer.x = width * TOUCH_REST_X;
+        pointer.y = height * TOUCH_REST_Y;
+        placeCursor(pointer.x, pointer.y);
+        showCursor();
+      }
     }
 
     // ---- target pulse (scale + brightness + glow flash), once per crossing -
@@ -256,7 +268,7 @@ export default function HeroMotion({
       const colors: string[] = [];
       for (let i = 0; i < count; i++) {
         const a = Math.random() * Math.PI * 2;
-        const len = 7 + Math.random() * 11; // 7-18px
+        const len = 15 + Math.random() * 21; // 15-36px, roughly double the original
         const midR = len * (0.4 + Math.random() * 0.3);
         const jitter = (Math.random() - 0.5) * 8;
         const midA = a + (Math.random() - 0.5) * 0.9;
@@ -277,7 +289,7 @@ export default function HeroMotion({
           continue;
         }
         const alpha = (s.life / SPARK_LIFE) * 0.92;
-        ctx!.lineWidth = 1.1;
+        ctx!.lineWidth = 1.4; // heavier so the longer bolts still read
         s.segs.forEach(([x, y, mx, my, ex, ey], j) => {
           ctx!.beginPath();
           ctx!.moveTo(x, y);
@@ -507,16 +519,14 @@ export default function HeroMotion({
 
     function endDrag() {
       dragging = false;
-      if (coarse) {
-        // no hover on touch: the glyph fades out with the finger
-        cursorVisible = false;
-        if (cursorRef.current) cursorRef.current.style.opacity = "0";
-      }
+      // On touch the glyph stays where the finger left it, still sparking,
+      // rather than vanishing the moment contact ends.
     }
 
     function onPointerLeave() {
-      cursorVisible = false;
       dragging = false;
+      if (coarse) return; // the resting glyph stays put on touch devices
+      cursorVisible = false;
       tiltTarget.x = 0;
       tiltTarget.y = 0;
       if (cursorRef.current) cursorRef.current.style.opacity = "0";
