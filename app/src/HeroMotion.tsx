@@ -34,6 +34,22 @@ const DRIFT = {
   ease: 0.06, // how quickly it glides back into the drift after a drag
 };
 
+/** Offset from the drift centre at a given step. */
+function driftOffset(t: number) {
+  return {
+    x:
+      Math.sin(t * DRIFT.xSlow) * DRIFT.xAmpSlow +
+      Math.sin(t * DRIFT.xFast) * DRIFT.xAmpFast,
+    y:
+      Math.cos(t * DRIFT.ySlow) * DRIFT.yAmpSlow +
+      Math.sin(t * DRIFT.yFast) * DRIFT.yAmpFast,
+  };
+}
+
+/** Keep the drift centre far enough inside the box that the orbit stays visible. */
+const DRIFT_MARGIN_X = DRIFT.xAmpSlow + DRIFT.xAmpFast + 20;
+const DRIFT_MARGIN_Y = DRIFT.yAmpSlow + DRIFT.yAmpFast + 20;
+
 // The style pack specified a destination-out trail-fade. That technique can't
 // actually reach zero at 8-bit alpha precision (5 * 0.91 rounds back to 5), so it
 // left a permanent faint film on the canvas. We clear every frame instead and let
@@ -167,6 +183,7 @@ export default function HeroMotion({
     let glyphX = 0;
     let glyphY = 0;
     let driftT = 0;
+    let restSeeded = false;
     let dragging = false;
     let width = 0;
     let height = 0;
@@ -204,8 +221,15 @@ export default function HeroMotion({
       ctx!.clearRect(0, 0, width, height); // no stale trail after a resize
       cacheTargets();
       // On touch the glyph is always on show, so give it a home to sit in.
-      restX = width * TOUCH_REST_X;
-      restY = height * TOUCH_REST_Y;
+      if (!restSeeded) {
+        restX = width * TOUCH_REST_X;
+        restY = height * TOUCH_REST_Y;
+        restSeeded = true;
+      } else {
+        // a resize must not teleport a glyph the visitor has already moved
+        restX = clamp(restX, DRIFT_MARGIN_X, Math.max(DRIFT_MARGIN_X, width - DRIFT_MARGIN_X));
+        restY = clamp(restY, DRIFT_MARGIN_Y, Math.max(DRIFT_MARGIN_Y, height - DRIFT_MARGIN_Y));
+      }
       if (coarse && !dragging) {
         if (!glyphX && !glyphY) {
           glyphX = restX;
@@ -367,14 +391,9 @@ export default function HeroMotion({
       // drift path rather than snapping, so releasing a drag glides back in.
       if (coarse && !dragging) {
         driftT++;
-        const targetX =
-          restX +
-          Math.sin(driftT * DRIFT.xSlow) * DRIFT.xAmpSlow +
-          Math.sin(driftT * DRIFT.xFast) * DRIFT.xAmpFast;
-        const targetY =
-          restY +
-          Math.cos(driftT * DRIFT.ySlow) * DRIFT.yAmpSlow +
-          Math.sin(driftT * DRIFT.yFast) * DRIFT.yAmpFast;
+        const off = driftOffset(driftT);
+        const targetX = restX + off.x;
+        const targetY = restY + off.y;
         glyphX = lerp(glyphX, targetX, DRIFT.ease);
         glyphY = lerp(glyphY, targetY, DRIFT.ease);
         placeCursor(glyphX, glyphY);
@@ -564,8 +583,21 @@ export default function HeroMotion({
 
     function endDrag() {
       dragging = false;
-      // On touch the glyph stays where the finger left it, still sparking,
-      // rather than vanishing the moment contact ends.
+      if (!coarse) return;
+      // The glyph stays where the finger left it and hovers around *there*,
+      // rather than sailing back to one fixed spot. Cancelling out the current
+      // wave offset means the drift resumes from exactly this point with no jump.
+      const off = driftOffset(driftT);
+      restX = clamp(
+        glyphX - off.x,
+        DRIFT_MARGIN_X,
+        Math.max(DRIFT_MARGIN_X, width - DRIFT_MARGIN_X)
+      );
+      restY = clamp(
+        glyphY - off.y,
+        DRIFT_MARGIN_Y,
+        Math.max(DRIFT_MARGIN_Y, height - DRIFT_MARGIN_Y)
+      );
     }
 
     function onPointerLeave() {
@@ -716,4 +748,3 @@ export default function HeroMotion({
     </section>
   );
 }
-
