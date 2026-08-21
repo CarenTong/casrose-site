@@ -178,6 +178,13 @@ export default function ContactSection({ asPanel = false, open = false, onClose 
             number ZB941135.
           </p>
           <p className="cr-legal">71–75 Shelton Street, Covent Garden, London, WC2H 9JQ</p>
+          <p className="cr-legal cr-legal-links">
+            <a href="/privacy.html">Privacy</a>
+            <span aria-hidden="true"> · </span>
+            <a href="/terms.html">Terms</a>
+            <span aria-hidden="true"> · </span>
+            <a href="/data-deletion.html">Data deletion</a>
+          </p>
         </div>
       </div>
     </section>
