@@ -210,6 +210,25 @@
   margin-top: 6px;
 }
 
+.cr-footer .cr-legal-links {
+  margin-top: 10px;
+}
+
+/* Underlined rather than colour-only, so the links are findable against the
+   low-contrast footer text. */
+.cr-footer .cr-legal-links a {
+  color: #8a7f6d;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 181, 110, 0.25);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.cr-footer .cr-legal-links a:hover,
+.cr-footer .cr-legal-links a:focus-visible {
+  color: #e8b56e;
+  border-color: rgba(232, 181, 110, 0.6);
+}
+
 @media (max-width: 600px) {
   .cr-contact {
     padding: 52px 18px 44px;
