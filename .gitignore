@@ -4,3 +4,6 @@ dist-single
 *.local
 .DS_Store
 .vite
+
+# one-off edit scripts used while developing
+*.cjs

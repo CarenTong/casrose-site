@@ -239,3 +239,73 @@
 .cr-footer a:focus-visible {
   color: var(--gold);
 }
+
+/* ============================================================================
+   Panel mode (phones). The page behind does not scroll, so the form arrives as
+   a full-screen sheet from the CTA and the panel scrolls internally.
+   ========================================================================== */
+
+.cr-contact.is-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border-top: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 56px 18px 40px;
+  /* keep clear of the notch and the home indicator */
+  padding-top: max(56px, calc(env(safe-area-inset-top) + 44px));
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.32s ease, opacity 0.32s ease, visibility 0s linear 0.32s;
+}
+
+.cr-contact.is-panel.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  transition: transform 0.32s ease, opacity 0.32s ease, visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-contact.is-panel {
+    transition: opacity 0.01s linear, visibility 0s linear 0.01s;
+    transform: none;
+  }
+  .cr-contact.is-panel.is-open {
+    transition: opacity 0.01s linear, visibility 0s;
+    transform: none;
+  }
+}
+
+.cr-close {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  width: 44px; /* full tap target */
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.cr-close:hover,
+.cr-close:focus-visible {
+  color: var(--gold);
+  outline: none;
+  background: rgba(232, 181, 110, 0.08);
+}
+
+/* the footer sits inside the section now */
+.cr-contact .cr-footer {
+  margin-top: 40px;
+  background: transparent;
+}

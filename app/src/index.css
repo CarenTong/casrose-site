@@ -14,8 +14,6 @@ body {
   background: #14110e; /* matches the hero so there's no flash/letterbox */
   min-height: 100vh;
   min-height: 100dvh;
-  /* The hero fills the first screen, the contact section sits below it, so the
-     page scrolls. Horizontal overflow stays clipped. */
   overflow-x: hidden;
 }
 
@@ -27,5 +25,21 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+/* While the mobile contact panel is open, nothing behind it moves. */
+body.cr-locked {
+  overflow: hidden;
+}
+
+/* On phones the hero owns the viewport outright: a finger drag has to mean
+   "draw the glitter trail", and it cannot do that if the page scrolls under it.
+   The contact form is reached through the CTA instead. */
+@media (max-width: 600px), (pointer: coarse) {
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
   }
 }
