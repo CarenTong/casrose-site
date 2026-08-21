@@ -46,6 +46,9 @@ jobs:
           cp index.html deploy/index.html
           cp .htaccess deploy/.htaccess
           cp contact.php deploy/contact.php
+          cp privacy.html deploy/privacy.html
+          cp terms.html deploy/terms.html
+          cp data-deletion.html deploy/data-deletion.html
           ls -la deploy
 
       - name: Fail if the build produced nothing
@@ -86,3 +89,21 @@ jobs:
             echo "$body" | head -c 400
             exit 1
           fi
+
+      # These three URLs are registered in the Meta App Dashboard (privacy policy,
+      # terms of service, data deletion instructions). Meta fetches them and rejects
+      # the app settings if they 404, so a deploy that drops them must fail loudly.
+      - name: Verify the legal pages are served
+        run: |
+          failed=0
+          for page in privacy.html terms.html data-deletion.html; do
+            url="https://casrose.co.uk/$page?ci=${{ github.run_id }}"
+            code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 "$url" || echo "000")
+            if [ "$code" = "200" ]; then
+              echo "$page -> 200"
+            else
+              echo "::error::$page returned HTTP $code - Meta will reject this URL."
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then exit 1; fi
