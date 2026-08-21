@@ -347,9 +347,18 @@
   cursor: pointer;
 }
 
-.casrose-hero.is-coarse .casrose-cursor,
+/* The ambient orb is a hover flourish with no touch equivalent. The emblem
+   cursor, though, is shown while a finger is down — see TOUCH_CURSOR_LIFT. */
 .casrose-hero.is-coarse .casrose-orb {
   display: none;
+}
+
+/* bigger on touch: it sits above the fingertip and needs to read at arm's length */
+.casrose-hero.is-coarse .casrose-cursor {
+  width: 34px;
+  height: 34px;
+  /* fade out with the finger rather than vanishing */
+  transition: opacity 0.22s ease;
 }
 
 .casrose-hero.is-coarse .casrose-emblem {
