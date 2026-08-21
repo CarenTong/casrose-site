@@ -15,14 +15,24 @@ const ORB_LERP = 0.12;
 const SPARK_CHANCE = 0.055; // per frame ≈ ~3/sec at 60fps
 const SPARK_LIFE = 16; // frames a spark stays visible before it's gone
 
-// On touch the glyph is drawn above the contact point: a fingertip completely
-// covers a 26px mark, so centring it on the touch would hide the whole effect.
-const TOUCH_CURSOR_LIFT = 46;
-
-// Where the glyph waits on a touch device when nobody is dragging, as a
-// fraction of the hero box: below the CTA and clear of the hint line.
+// Where the glyph drifts around on a touch device when nobody is dragging, as
+// a fraction of the hero box: below the CTA and clear of the hint line.
 const TOUCH_REST_X = 0.5;
-const TOUCH_REST_Y = 0.74;
+const TOUCH_REST_Y = 0.72;
+
+// Idle drift. Two out-of-phase waves per axis so the path wanders — circular,
+// then wavy, then back — rather than tracing an obvious repeating loop.
+const DRIFT = {
+  xFast: 0.027,
+  xSlow: 0.011,
+  yFast: 0.019,
+  ySlow: 0.009,
+  xAmpFast: 18,
+  xAmpSlow: 52,
+  yAmpFast: 12,
+  yAmpSlow: 34,
+  ease: 0.06, // how quickly it glides back into the drift after a drag
+};
 
 // The style pack specified a destination-out trail-fade. That technique can't
 // actually reach zero at 8-bit alpha precision (5 * 0.91 rounds back to 5), so it
@@ -150,6 +160,13 @@ export default function HeroMotion({
     const tiltTarget = { x: 0, y: 0 };
     const orb = { x: 0, y: 0 };
     let orbSeeded = false;
+    // Idle-drift state for the touch glyph: where it orbits, where it is now,
+    // and how far through the drift we are.
+    let restX = 0;
+    let restY = 0;
+    let glyphX = 0;
+    let glyphY = 0;
+    let driftT = 0;
     let dragging = false;
     let width = 0;
     let height = 0;
@@ -187,10 +204,16 @@ export default function HeroMotion({
       ctx!.clearRect(0, 0, width, height); // no stale trail after a resize
       cacheTargets();
       // On touch the glyph is always on show, so give it a home to sit in.
+      restX = width * TOUCH_REST_X;
+      restY = height * TOUCH_REST_Y;
       if (coarse && !dragging) {
-        pointer.x = width * TOUCH_REST_X;
-        pointer.y = height * TOUCH_REST_Y;
-        placeCursor(pointer.x, pointer.y);
+        if (!glyphX && !glyphY) {
+          glyphX = restX;
+          glyphY = restY;
+        }
+        pointer.x = glyphX;
+        pointer.y = glyphY;
+        placeCursor(glyphX, glyphY);
         showCursor();
       }
     }
@@ -340,6 +363,25 @@ export default function HeroMotion({
           orbRef.current.style.transform = `translate(${orb.x}px, ${orb.y}px)`;
         }
       }
+      // Touch glyph drifts while idle, to invite a finger. It eases toward the
+      // drift path rather than snapping, so releasing a drag glides back in.
+      if (coarse && !dragging) {
+        driftT++;
+        const targetX =
+          restX +
+          Math.sin(driftT * DRIFT.xSlow) * DRIFT.xAmpSlow +
+          Math.sin(driftT * DRIFT.xFast) * DRIFT.xAmpFast;
+        const targetY =
+          restY +
+          Math.cos(driftT * DRIFT.ySlow) * DRIFT.yAmpSlow +
+          Math.sin(driftT * DRIFT.yFast) * DRIFT.yAmpFast;
+        glyphX = lerp(glyphX, targetX, DRIFT.ease);
+        glyphY = lerp(glyphY, targetY, DRIFT.ease);
+        placeCursor(glyphX, glyphY);
+        // sparks originate from wherever the glyph currently is
+        pointer.x = glyphX;
+        pointer.y = glyphY;
+      }
       ambientRaf = requestAnimationFrame(ambientTick);
     }
 
@@ -349,7 +391,7 @@ export default function HeroMotion({
 
       // intermittent cursor sparks (only while the glyph is live)
       if (cursorVisible && Math.random() < SPARK_CHANCE) {
-        spawnSpark(pointer.x, pointer.y - (coarse ? TOUCH_CURSOR_LIFT : 0));
+        spawnSpark(pointer.x, pointer.y);
       }
       drawSparks();
 
@@ -448,9 +490,8 @@ export default function HeroMotion({
     function placeCursor(x: number, y: number) {
       if (!cursorRef.current) return;
       const size = coarse ? 17 : 13; // half the glyph width
-      const lift = coarse ? TOUCH_CURSOR_LIFT : 0;
-      cursorRef.current.style.transform =
-        `translate(${x - size}px, ${y - size - lift}px)`;
+      // centred on the pointer, so the mark and its glitter share a position
+      cursorRef.current.style.transform = `translate(${x - size}px, ${y - size}px)`;
     }
 
     function onPointerMove(e: PointerEvent) {
@@ -464,6 +505,8 @@ export default function HeroMotion({
       // follows the pointer the whole time it is over the hero.
       if (coarse) {
         if (dragging) {
+          glyphX = p.x;
+          glyphY = p.y;
           placeCursor(p.x, p.y);
           if (!cursorVisible) showCursor();
         }
@@ -510,6 +553,8 @@ export default function HeroMotion({
       }
       dragging = true;
       if (coarse) {
+        glyphX = p.x;
+        glyphY = p.y;
         placeCursor(p.x, p.y);
         showCursor();
       }
@@ -671,3 +716,4 @@ export default function HeroMotion({
     </section>
   );
 }
+
