@@ -25,9 +25,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: app
-        run: |
-          npm ci
-          npm install --no-save sharp png-to-ico
+        run: npm ci
 
       # GitHub runners ship with PHP, so the endpoint gets syntax-checked on
       # every push. A typo here would 500 the contact form instead of emailing.
@@ -36,7 +34,9 @@ jobs:
 
       - name: Build the site
         working-directory: app
-        run: npm run site
+        run: |
+          npm run site
+          node make-og.mjs
 
       # Stage exactly what should live in public_html — the single self-contained
       # index.html and the .htaccess. Nothing else is served.
@@ -49,6 +49,9 @@ jobs:
           cp privacy.html deploy/privacy.html
           cp terms.html deploy/terms.html
           cp data-deletion.html deploy/data-deletion.html
+          cp og-image.png deploy/og-image.png
+          cp robots.txt deploy/robots.txt
+          cp sitemap.xml deploy/sitemap.xml
           ls -la deploy
 
       - name: Fail if the build produced nothing

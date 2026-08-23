@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# The Vite source that builds the site is not content.
+Disallow: /app/
+
+Sitemap: https://casrose.co.uk/sitemap.xml

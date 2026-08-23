@@ -7,3 +7,10 @@ dist-single
 
 # one-off edit scripts used while developing
 *.cjs
+
+# Build output. CI regenerates both of these from /app on every deploy, so
+# committing them only creates merge conflicts between branches: two branches
+# each produce a different 320KB minified file that git cannot merge.
+# Root-anchored, because app/index.html is the Vite template and must stay tracked.
+/index.html
+/og-image.png
