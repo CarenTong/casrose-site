@@ -143,13 +143,21 @@ export default function ContactSection({ asPanel = false, open = false, onClose 
             <input id="cr-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
           </div>
 
+          <div className="cr-check">
+            <input id="cr-marketing" name="marketing" type="checkbox" value="yes" />
+            <label htmlFor="cr-marketing">
+              Also add me to the Casrose mailing list — occasional updates, unsubscribe any
+              time.
+            </label>
+          </div>
+
           <button type="submit" className="cr-submit" disabled={status === "sending"}>
             {status === "sending" ? "Sending…" : "Send message"}
           </button>
 
           <p className="cr-privacy">
-            Your details are emailed to me so I can reply, and are not used for anything
-            else, shared, or added to a mailing list.
+            Your details are emailed to me so I can reply, and are not shared or sold. You
+            are only added to the mailing list if you tick the box above.
           </p>
 
           <p className={`cr-status is-${status}`} role="status" aria-live="polite">

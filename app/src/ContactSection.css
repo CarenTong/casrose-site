@@ -328,3 +328,42 @@
   margin-top: 40px;
   background: transparent;
 }
+
+/* ---- mailing-list opt-in -------------------------------------------------- */
+
+/* Unticked by default and never required to send an enquiry: marketing consent
+   has to be a positive, separate, freely-given action. */
+.cr-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-top: 2px;
+}
+
+.cr-check input[type="checkbox"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #b3905e; /* gold tick rather than the browser's default blue */
+  cursor: pointer;
+}
+
+.cr-check label {
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  cursor: pointer;
+  /* the label is the tap target as much as the box itself */
+  padding: 1px 0;
+}
+
+.cr-check input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.cr-check:hover label {
+  color: var(--ink);
+}

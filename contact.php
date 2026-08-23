@@ -113,11 +113,20 @@ if (rateLimited()) {
 $safeName  = headerSafe($name);
 $safeEmail = headerSafe($email);
 
-$subject = 'casrose.co.uk enquiry from ' . $safeName;
+// Marketing consent has to be evidenced, not merely acted on: if anyone ever
+// asks why they are on the list, the record of what they agreed to and when is
+// the answer. It goes in the email because that is the only store this site has.
+$optedIn = ($_POST['marketing'] ?? '') === 'yes';
+$consent = $optedIn
+    ? 'YES - ticked the opt-in box on casrose.co.uk at ' . gmdate('Y-m-d H:i:s') . ' UTC'
+    : 'no';
+
+$subject = ($optedIn ? '[list opt-in] ' : '') . 'casrose.co.uk enquiry from ' . $safeName;
 $body = "New enquiry from the casrose.co.uk contact form.\n\n"
       . "Name:  {$safeName}\n"
       . "Email: {$safeEmail}\n"
-      . 'Time:  ' . gmdate('Y-m-d H:i:s') . " UTC\n\n"
+      . 'Time:  ' . gmdate('Y-m-d H:i:s') . " UTC\n"
+      . "Mailing list: {$consent}\n\n"
       . "Message:\n{$message}\n";
 
 $headers = implode("\r\n", [
