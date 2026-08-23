@@ -78,24 +78,26 @@ jobs:
             **/.git*
             **/.git*/**
 
+      # Retries rather than checking once: an FTP upload settles a moment after
+      # the transfer reports done, and a single early fetch produced a false
+      # failure that looked identical to a genuinely broken deploy.
       - name: Verify the live site actually updated
         run: |
-          echo "Waiting a moment for the filesystem to settle..."
-          sleep 10
           url="https://casrose.co.uk/?ci=${{ github.run_id }}"
-          body=$(curl -sSL --max-time 30 "$url" || true)
-          if echo "$body" | grep -q "casrose-hero"; then
-            echo "Live site is serving the hero page."
-          else
-            echo "::error::casrose.co.uk did not serve the expected page after deploy."
-            echo "First 400 chars of what it returned:"
-            echo "$body" | head -c 400
-            exit 1
-          fi
+          for attempt in 1 2 3 4 5 6; do
+            sleep $(( attempt * 5 ))
+            body=$(curl -sSL --max-time 30 "$url" || true)
+            if echo "$body" | grep -q "casrose-hero"; then
+              echo "Live site is serving the hero page (attempt $attempt)."
+              exit 0
+            fi
+            echo "Attempt $attempt: not serving the expected page yet."
+          done
+          echo "::error::casrose.co.uk did not serve the expected page after 6 attempts."
+          echo "Last response, first 400 chars:"
+          echo "$body" | head -c 400
+          exit 1
 
-      # These three URLs are registered in the Meta App Dashboard (privacy policy,
-      # terms of service, data deletion instructions). Meta fetches them and rejects
-      # the app settings if they 404, so a deploy that drops them must fail loudly.
       - name: Verify the legal pages are served
         run: |
           failed=0

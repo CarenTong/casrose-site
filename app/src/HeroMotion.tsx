@@ -719,7 +719,12 @@ export default function HeroMotion({
                 {label}
               </button>
             ))}
-            <button type="button" className="casrose-navlink" data-target onClick={onContact}>
+            <button
+              type="button"
+              className="casrose-navlink is-actionable"
+              data-target
+              onClick={onContact}
+            >
               Contact
             </button>
           </div>
