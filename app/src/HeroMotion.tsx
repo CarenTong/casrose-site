@@ -128,6 +128,31 @@ export default function HeroMotion({
   const emblemRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
 
+  // The "under construction" pill belongs to the two links that go nowhere yet,
+  // so it only shows while Work or Studio is hovered or focused. Touch has no
+  // hover, so a tap reveals it briefly instead.
+  const [statusShown, setStatusShown] = useState(false);
+  const statusTimer = useRef<number | undefined>(undefined);
+
+  function revealStatus() {
+    window.clearTimeout(statusTimer.current);
+    setStatusShown(true);
+  }
+
+  function hideStatus() {
+    window.clearTimeout(statusTimer.current);
+    setStatusShown(false);
+  }
+
+  /** Tap on a dead link: show the pill, then take it away again. */
+  function flashStatus() {
+    window.clearTimeout(statusTimer.current);
+    setStatusShown(true);
+    statusTimer.current = window.setTimeout(() => setStatusShown(false), 2600);
+  }
+
+  useEffect(() => () => window.clearTimeout(statusTimer.current), []);
+
   // Media-query driven modes. Kept in state so the effect re-initialises when
   // they change (e.g. the user toggles reduced-motion / device emulation).
   const [reduced, setReduced] = useState(
@@ -663,21 +688,37 @@ export default function HeroMotion({
           <button type="button" className="casrose-brand" data-target>
             CASROSE
           </button>
-          {/* direct child of nav so narrow screens can drop the links onto their
-              own row while the pill stays on the first row beside the wordmark */}
+          {/* Absolutely positioned so appearing and disappearing never reflows the
+              nav. Kept in the DOM while hidden so the aria-describedby on the two
+              dead links still reads it out. */}
           {underConstruction && (
-            <span className="casrose-status" role="status">
+            <span
+              id="casrose-status"
+              className={`casrose-status${statusShown ? " is-shown" : ""}`}
+            >
               <span className="casrose-status-dot" aria-hidden="true" />
               Under construction
             </span>
           )}
           <div className="casrose-navlinks">
-            <button type="button" className="casrose-navlink" data-target>
-              Work
-            </button>
-            <button type="button" className="casrose-navlink" data-target>
-              Studio
-            </button>
+            {["Work", "Studio"].map((label) => (
+              <button
+                key={label}
+                type="button"
+                className="casrose-navlink"
+                data-target
+                // describedby means a screen reader announces "Work, under
+                // construction" without depending on a hover that never happens
+                aria-describedby={underConstruction ? "casrose-status" : undefined}
+                onMouseEnter={underConstruction ? revealStatus : undefined}
+                onMouseLeave={underConstruction ? hideStatus : undefined}
+                onFocus={underConstruction ? revealStatus : undefined}
+                onBlur={underConstruction ? hideStatus : undefined}
+                onClick={underConstruction ? flashStatus : undefined}
+              >
+                {label}
+              </button>
+            ))}
             <button type="button" className="casrose-navlink" data-target onClick={onContact}>
               Contact
             </button>
