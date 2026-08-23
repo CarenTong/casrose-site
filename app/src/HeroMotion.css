@@ -78,6 +78,7 @@
 /* ---- nav ----------------------------------------------------------------- */
 
 .casrose-nav {
+  position: relative; /* anchor for the status pill */
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -98,9 +99,6 @@
   order: 2;
 }
 
-.casrose-status {
-  order: 3;
-}
 
 .casrose-brand {
   font-family: "Jost", sans-serif;
@@ -140,8 +138,25 @@
   outline: none;
 }
 
-/* under-construction status pill (top-right, non-interactive) */
+/* Under-construction pill. Only shown while Work or Studio is hovered, focused
+   or tapped, since those are the two links that go nowhere yet.
+
+   Taken out of the flex flow entirely: if it participated in layout, showing and
+   hiding it would shove the nav links sideways every time the pointer crossed a
+   link. Hidden with opacity rather than display:none so it stays in the
+   accessibility tree for the aria-describedby on those links. */
 .casrose-status {
+  position: absolute;
+  /* absolute positioning ignores the nav padding, so match it explicitly or the
+     pill sits flush against the screen edge */
+  right: max(24px, env(safe-area-inset-right));
+  /* sits just under the nav rather than inside it: at the right-hand end of the
+     row it would land on top of the Contact link */
+  top: 100%;
+  margin-top: -8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -152,12 +167,21 @@
   font-weight: 400;
   color: var(--cta);
   padding: 6px 12px;
-  margin-left: 6px;
   border: 1px solid rgba(232, 181, 110, 0.4);
   border-radius: 999px;
   background: rgba(232, 181, 110, 0.05);
   white-space: nowrap;
   max-width: 100%;
+}
+
+.casrose-status.is-shown {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .casrose-status {
+    transition: none;
+  }
 }
 
 .casrose-status-dot {
@@ -381,11 +405,10 @@
   }
 
   .casrose-status {
-    order: 2; /* stays on row 1, right of the wordmark */
+    right: max(16px, env(safe-area-inset-right));
     font-size: 9px;
     letter-spacing: 0.1em;
     padding: 5px 10px;
-    margin-left: 0;
   }
 
   .casrose-navlinks {
