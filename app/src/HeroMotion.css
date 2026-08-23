@@ -494,3 +494,53 @@
     padding-bottom: 8px;
   }
 }
+
+/* Contact is the only nav link that goes anywhere, so it gets a clickability
+   cue the other two do not. This matters more here than on an ordinary page:
+   the hero sets cursor:none and draws its own emblem pointer, so the usual
+   hand-cursor affordance simply does not exist.
+
+   An underline that wipes in from the left, plus a slight lift. */
+.casrose-navlink.is-actionable {
+  position: relative;
+}
+
+.casrose-navlink.is-actionable::after {
+  content: "";
+  position: absolute;
+  left: 6px; /* aligns with the text, inside the tap padding */
+  right: 6px;
+  bottom: 7px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(232, 181, 110, 0.9),
+    rgba(246, 233, 200, 0.9)
+  );
+  box-shadow: 0 0 8px rgba(232, 181, 110, 0.7);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.casrose-navlink.is-actionable:hover::after,
+.casrose-navlink.is-actionable:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.casrose-navlink.is-actionable:hover,
+.casrose-navlink.is-actionable:focus-visible {
+  color: #fbf3dd;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .casrose-navlink.is-actionable::after {
+    transition: none;
+  }
+}
+
+/* Touch devices get no hover, so show the underline permanently there - it is
+   the only standing hint that this link differs from the other two. */
+.casrose-hero.is-coarse .casrose-navlink.is-actionable::after {
+  transform: scaleX(1);
+}
