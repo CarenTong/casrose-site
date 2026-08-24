@@ -164,7 +164,7 @@ export default function ContactSection({ asPanel = false, open = false, onClose 
               <a href="mailto:cas@casrose.co.uk">cas@casrose.co.uk</a>
             </li>
             <li>
-              <a href="tel:+44349956460">+44 34995 6460</a>
+              <a href="tel:+447349956460">+44 7349 956460</a>
             </li>
           </ul>
         </div>

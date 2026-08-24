@@ -517,15 +517,29 @@ export default function HeroMotion({
 
     // ---- pointer plumbing --------------------------------------------------
     let cursorVisible = false;
+    // The glyph is opaque enough to hide a small nav label underneath it, so it
+    // fades back while the pointer is over anything clickable and lets the
+    // element's own hover state show through.
+    let overInteractive = false;
 
     function localPoint(e: PointerEvent) {
       const rect = section!.getBoundingClientRect();
       return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
+    /** One place decides the glyph's opacity, so the states cannot fight. */
+    function applyCursorOpacity() {
+      if (!cursorRef.current) return;
+      cursorRef.current.style.opacity = !cursorVisible
+        ? "0"
+        : overInteractive
+          ? "0.1"
+          : "1";
+    }
+
     function showCursor() {
       cursorVisible = true;
-      if (cursorRef.current) cursorRef.current.style.opacity = "1";
+      applyCursorOpacity();
       // the ambient orb stays a hover-only flourish; touch gets the glyph alone
       if (!coarse && orbRef.current) orbRef.current.style.opacity = "1";
     }
@@ -540,6 +554,13 @@ export default function HeroMotion({
 
     function onPointerMove(e: PointerEvent) {
       const p = localPoint(e);
+      // buttons and links are the only interactive things in the hero
+      const target = e.target as Element | null;
+      const nowOver = !!target?.closest?.("button, a");
+      if (nowOver !== overInteractive) {
+        overInteractive = nowOver;
+        applyCursorOpacity();
+      }
       prevPointer.x = pointer.x;
       prevPointer.y = pointer.y;
       pointer.x = p.x;
@@ -627,11 +648,15 @@ export default function HeroMotion({
 
     function onPointerLeave() {
       dragging = false;
-      if (coarse) return; // the resting glyph stays put on touch devices
+      overInteractive = false; // cleared for both pointer types
+      if (coarse) {
+        applyCursorOpacity(); // resting glyph stays visible on touch
+        return;
+      }
       cursorVisible = false;
       tiltTarget.x = 0;
       tiltTarget.y = 0;
-      if (cursorRef.current) cursorRef.current.style.opacity = "0";
+      applyCursorOpacity();
       if (orbRef.current) orbRef.current.style.opacity = "0";
     }
 

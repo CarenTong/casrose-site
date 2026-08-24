@@ -330,6 +330,8 @@
   opacity: 0;
   filter: drop-shadow(0 0 7px rgba(232, 181, 110, 0.85));
   will-change: transform, opacity;
+  /* fade as it passes over something clickable, rather than blinking out */
+  transition: opacity 0.18s ease;
 }
 
 .casrose-cursor svg {
