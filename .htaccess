@@ -3,6 +3,19 @@
 RewriteEngine On
 RewriteRule ^app(/|$) - [F,L]
 
+# Short, shareable URL for the Reliable Roofing status page.
+RewriteRule ^reliable-roofing/?$ reliable-roofing.html [L]
+
+# Unlisted, not secret: anyone with the link gets in, search engines do not
+# list it. robots.txt deliberately still ALLOWS this path - a disallowed page
+# cannot be read, so its noindex is never seen and the bare URL can still be
+# indexed from an inbound link.
+<IfModule mod_headers.c>
+  <FilesMatch "^reliable-roofing[.]html$">
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+  </FilesMatch>
+</IfModule>
+
 # Long-cache nothing: index.html is the whole site and changes on every deploy.
 <IfModule mod_headers.c>
   <FilesMatch "\.html$">

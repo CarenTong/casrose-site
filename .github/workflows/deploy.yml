@@ -52,6 +52,7 @@ jobs:
           cp og-image.png deploy/og-image.png
           cp robots.txt deploy/robots.txt
           cp sitemap.xml deploy/sitemap.xml
+          cp reliable-roofing.html deploy/reliable-roofing.html
           ls -la deploy
 
       - name: Fail if the build produced nothing
@@ -101,7 +102,7 @@ jobs:
       - name: Verify the legal pages are served
         run: |
           failed=0
-          for page in privacy.html terms.html data-deletion.html; do
+          for page in privacy.html terms.html data-deletion.html reliable-roofing; do
             url="https://casrose.co.uk/$page?ci=${{ github.run_id }}"
             code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 "$url" || echo "000")
             if [ "$code" = "200" ]; then
