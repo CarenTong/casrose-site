@@ -42,6 +42,18 @@ unattended.
   search results, and `robots.txt` deliberately still ALLOWS the path. A disallowed page
   is never fetched, so its noindex is never read, and the bare URL can still be indexed
   from an inbound link.
+- **The guard is CI, not a promise.** `.github/workflows/status-page-guard.yml` runs
+  `tools/verify-status-page.mjs` on every pull request: the graph must be structurally
+  whole, the two figures must agree with the footer, the page must stay under 500 visible
+  words, the noindex must survive, and **the wording must match `tools/status-page-copy.txt`**.
+  A status-refresh branch that touches any file but the page fails outright.
+  It is a **required check on `main`**, because an agent merging its own PR merges past a
+  check that is merely advisory.
+- **Changing the wording is a human act**: `node tools/verify-status-page.mjs --update-copy`
+  re-approves the snapshot. That command must never appear in an unattended run.
+- `tools/test-status-page-guard.mjs` breaks the page eight ways and proves each guard
+  rejects it. CI runs it before trusting the guard, per `docs/agents/control-verification.md`
+  in the bot repo: prove the control fired, test the outcome and not the command.
 - The figures come from the whatsapp-site-report-agent repo, read-only over git. That
   repo is never committed to from here: committing there redeploys the live bot.
 
