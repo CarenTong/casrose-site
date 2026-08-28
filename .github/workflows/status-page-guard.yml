@@ -1,0 +1,58 @@
+name: status-page guard
+
+# reliable-roofing.html is client-facing and a weekly unattended agent edits it
+# and merges its own pull request (see CLAUDE.md). The deploy proves the page
+# returns 200; it cannot tell whether the graph still makes sense or whether the
+# wording drifted. This can, and it runs whether or not anyone is watching.
+#
+# Make this a REQUIRED status check on main, or an agent merging its own PR
+# simply merges past it.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The one-file check below compares against the base branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Prove the guard still fires before trusting what it says. A check that
+      # has quietly stopped checking is worse than no check: it reads as safety.
+      - name: The guards must fire
+        run: node tools/test-status-page-guard.mjs
+
+      - name: The page must be intact
+        run: node tools/verify-status-page.mjs
+
+      # The weekly agent is authorised to touch one file. Anything else in its
+      # diff means something unexpected happened, and it must not reach main.
+      - name: A weekly refresh may only touch the page
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'claude/status-refresh-')
+        run: |
+          set -euo pipefail
+          base="origin/${{ github.base_ref }}"
+          changed=$(git diff --name-only "$base"...HEAD)
+          echo "Files changed:"
+          echo "$changed" | sed 's/^/  /'
+          unexpected=$(echo "$changed" | grep -v '^reliable-roofing\.html$' || true)
+          if [ -n "$unexpected" ]; then
+            echo "::error::A status-refresh branch may only change reliable-roofing.html."
+            echo "Also changed:"
+            echo "$unexpected" | sed 's/^/  /'
+            exit 1
+          fi
+          echo "Only the status page changed, as expected."
