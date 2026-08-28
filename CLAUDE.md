@@ -22,6 +22,29 @@ nothing confidential, no client names beyond what the site already shows, no vau
 - Secrets (`FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`) are GitHub repository secrets set by
   Caren in the GitHub UI. Never through chat, never in the repo.
 
+## /reliable-roofing — the one page a robot may deploy
+
+A weekly scheduled agent refreshes `reliable-roofing.html` and **merges its own PR**,
+unattended (Caren, 2026-08-28). That is a deliberate exception to the attended-merge rule
+above, and it is scoped to this one file. Nothing else in this repo may be merged
+unattended.
+
+- **The mechanical edits are a script, not a prompt**: `tools/refresh-status-page.mjs`.
+  It rescales the timeline, updates the two counted figures and the date stamps, and
+  refuses to write if anything looks wrong. A model hand-editing thirty SVG coordinates
+  and then approving its own work is the failure the deploy cannot see: the live check
+  proves the page returns 200, not that the graph still makes sense.
+- **Run it, do not reproduce it.** `node tools/refresh-status-page.mjs --check` reports
+  without writing. It is idempotent: a second run must say "no change needed".
+- **The agent may merge only when the diff touches `reliable-roofing.html` alone.** Any
+  other file in the diff means something unexpected happened, and it stops.
+- The page is **unlisted, not secret**: `X-Robots-Tag` plus a meta tag keep it out of
+  search results, and `robots.txt` deliberately still ALLOWS the path. A disallowed page
+  is never fetched, so its noindex is never read, and the bare URL can still be indexed
+  from an inbound link.
+- The figures come from the whatsapp-site-report-agent repo, read-only over git. That
+  repo is never committed to from here: committing there redeploys the live bot.
+
 ## Hosting gotchas (each cost hours on 2026-08-20)
 
 - casrose.co.uk is an **add-on domain**. Its real path is
