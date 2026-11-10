@@ -172,7 +172,7 @@ export default function ContactSection({ asPanel = false, open = false, onClose 
         {/* Lives inside the section so the ICO registration is reachable in both
             layouts — on a phone the page itself no longer scrolls. */}
         <div className="cr-footer">
-          <p>Casrose — bespoke AI automation.</p>
+          <p>Casrose — Operating from a heart-led, community spirit.</p>
           <p className="cr-legal">
             Registered with the Information Commissioner&apos;s Office, registration
             number ZB941135.
