@@ -107,10 +107,10 @@ export default function ContactSection({ asPanel = false, open = false, onClose 
         )}
 
         <h2 className="cr-contact-title" id="cr-contact-title">
-          Start a project
+          Get in touch to work with me
         </h2>
         <p className="cr-contact-lede">
-          Tell me what you're trying to automate and I'll come back to you by email.
+          Tell me how you would like to work with me within the realms of music therapy, spirituality or making an impact to support good causes and I'll personally come back to you by email.
         </p>
 
         <form
